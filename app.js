@@ -1,4 +1,4 @@
-import { saveRsvp, watchRsvps, isDemo } from "./db.js";
+import { saveRsvp, watchRsvps, demoMode } from "./db.js";
 import { startPetals, celebrate, hearts } from "./effects.js";
 
 startPetals();
@@ -121,7 +121,7 @@ const paxSel = $("#pax");
 for (let i = 1; i <= (W.maxPax || 5); i++) paxSel.add(new Option(`${i} orang`, i));
 if (W.rsvpDeadline) $("#deadline").textContent = `Sila maklumkan kehadiran sebelum ${W.rsvpDeadline}`;
 if (guest) form.fullname.value = guest.slice(0, 80);
-if (isDemo) $("#demoNote").hidden = false;
+demoMode.then((demo) => { $("#demoNote").hidden = !demo; });
 
 form.addEventListener("change", () => {
   $("#paxWrap").hidden = form.attending.value !== "yes";
@@ -155,6 +155,7 @@ form.addEventListener("submit", async (e) => {
       attending,
       pax: form.pax.value,
       wish: form.wish.value,
+      website: form.website.value,
     });
     try { localStorage.setItem(SENT_KEY, "1"); } catch {}
     form.reset();

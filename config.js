@@ -43,18 +43,4 @@ window.WEDDING = {
   // Optional background music (mp3 path or URL). "" to disable.
   music: "audio.mp3",
 
-  /* -------------------------------------------------------
-     FIREBASE — paste your web app config from
-     Firebase console → Project settings → Your apps.
-     While apiKey is empty, RSVPs are saved in this browser
-     only (demo mode), so you can preview the card.
-     ------------------------------------------------------- */
-  firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: "",
-  },
 };

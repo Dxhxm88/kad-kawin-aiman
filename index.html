@@ -105,10 +105,12 @@
         <label>Ucapan <span class="muted">(Pilihan)</span>
           <textarea name="wish" rows="3" maxlength="500" placeholder="Tulis ucapan anda…"></textarea>
         </label>
+        <!-- spam trap: hidden from people, bots fill it in -->
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <button class="btn btn-gold" type="submit" id="submitBtn">Hantar RSVP</button>
         <p class="form-msg" id="formMsg" role="status"></p>
       </form>
-      <p class="demo-note" id="demoNote" hidden>Mod demo: Firebase belum disambungkan, jadi RSVP hanya disimpan dalam pelayar ini.</p>
+      <p class="demo-note" id="demoNote" hidden>Mod demo: pelayan RSVP tidak dapat dihubungi, jadi RSVP hanya disimpan dalam pelayar ini.</p>
     </section>
 
     <!-- ============ WISHES ============ -->

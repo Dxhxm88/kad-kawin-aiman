@@ -1,0 +1,4 @@
+node_modules/
+.netlify/
+# local test RSVPs saved by serve.py
+rsvps.json

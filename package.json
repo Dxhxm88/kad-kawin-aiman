@@ -1,0 +1,9 @@
+{
+  "name": "kad-kawin-aiman",
+  "private": true,
+  "type": "module",
+  "description": "Digital wedding card — RSVPs stored as JSON in Netlify Blobs",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

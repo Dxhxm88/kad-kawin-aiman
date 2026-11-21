@@ -405,3 +405,5 @@ body:not(.locked) .hero .big > span:last-child { animation: write 1.8s ease 2.6s
   .hero .big > .amp { opacity: 1; }
   .hero .ornament { transform: none; }
 }
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
