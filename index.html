@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jemputan Perkahwinan</title>
+  <meta name="description" content="Anda dijemput ke majlis perkahwinan kami" />
+  <meta name="theme-color" content="#f6f1e7" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body class="locked">
+  <div class="bg-glow" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <!-- ============ COVER ============ -->
+  <section id="cover" class="cover">
+    <div class="cover-inner">
+      <p class="eyebrow">Walimatul Urus</p>
+      <h1 class="script"><span data-f="bride"></span><span class="amp">&amp;</span><span data-f="groom"></span></h1>
+      <p class="cover-date" data-f="dateLabel"></p>
+      <div class="to" id="guestBox" hidden>
+        <p class="small">Kehadapan</p>
+        <p class="guest" id="guestName"></p>
+      </div>
+      <button id="openBtn" class="btn btn-gold">Buka Jemputan</button>
+    </div>
+  </section>
+
+  <main id="main">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero reveal">
+      <div class="ornament" aria-hidden="true"></div>
+      <p class="eyebrow">Walimatul Urus</p>
+      <h2 class="script big"><span data-f="bride"></span><span class="amp">&amp;</span><span data-f="groom"></span></h2>
+      <p class="date-big" data-f="dateLabel"></p>
+    </section>
+
+    <!-- ============ GREETING ============ -->
+    <section class="card reveal">
+      <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+      <p class="hosts" data-f="hosts"></p>
+      <p class="greeting" data-f="greeting"></p>
+      <p class="full-name" data-f="brideFull"></p>
+      <p class="amp-sm">&amp;</p>
+      <p class="full-name" data-f="groomFull"></p>
+    </section>
+
+    <!-- ============ COUNTDOWN ============ -->
+    <section class="card reveal">
+      <h3 class="title">Menghitung Hari</h3>
+      <div class="countdown" id="countdown">
+        <div><b id="cd-d">0</b><span>Hari</span></div>
+        <div><b id="cd-h">0</b><span>Jam</span></div>
+        <div><b id="cd-m">0</b><span>Minit</span></div>
+        <div><b id="cd-s">0</b><span>Saat</span></div>
+      </div>
+      <a id="calBtn" class="btn btn-outline" target="_blank" rel="noopener">Simpan ke Google Calendar</a>
+    </section>
+
+    <div class="duo">
+    <!-- ============ EVENT ============ -->
+    <section class="card reveal">
+      <h3 class="title">Majlis</h3>
+      <div class="info">
+        <p class="label">Tarikh</p><p data-f="dateLabel"></p>
+        <p class="label">Masa</p><p data-f="timeLabel"></p>
+        <p class="label">Tempat</p>
+        <p><strong data-f="venueName"></strong><br><span data-f="venueAddress"></span></p>
+      </div>
+      <div class="btn-row">
+        <a id="gmapsBtn" class="btn btn-outline" target="_blank" rel="noopener">Google Maps</a>
+        <a id="wazeBtn" class="btn btn-outline" target="_blank" rel="noopener">Waze</a>
+      </div>
+    </section>
+
+    <!-- ============ SCHEDULE ============ -->
+    <section class="card reveal">
+      <h3 class="title">Aturcara</h3>
+      <ol class="timeline" id="schedule"></ol>
+    </section>
+    </div>
+
+    <div class="duo">
+    <!-- ============ RSVP ============ -->
+    <section class="card reveal" id="rsvp">
+      <h3 class="title">RSVP</h3>
+      <p class="muted" id="deadline"></p>
+      <form id="rsvpForm" novalidate>
+        <label>Nama anda
+          <input name="fullname" required maxlength="80" autocomplete="name" placeholder="cth. Ahmad & keluarga" />
+        </label>
+        <fieldset class="choice">
+          <legend>Adakah anda akan hadir?</legend>
+          <label><input type="radio" name="attending" value="yes" checked /> <span>Ya, Saya akan hadir</span></label>
+          <label><input type="radio" name="attending" value="no" /> <span>Maaf, tidak dapat hadir</span></label>
+        </fieldset>
+        <label id="paxWrap">Bilangan Tetamu
+          <select name="pax" id="pax"></select>
+        </label>
+        <label>Ucapan <span class="muted">(Pilihan)</span>
+          <textarea name="wish" rows="3" maxlength="500" placeholder="Tulis ucapan anda…"></textarea>
+        </label>
+        <button class="btn btn-gold" type="submit" id="submitBtn">Hantar RSVP</button>
+        <p class="form-msg" id="formMsg" role="status"></p>
+      </form>
+      <p class="demo-note" id="demoNote" hidden>Mod demo: Firebase belum disambungkan, jadi RSVP hanya disimpan dalam pelayar ini.</p>
+    </section>
+
+    <!-- ============ WISHES ============ -->
+    <section class="card reveal">
+      <h3 class="title">Ucapan</h3>
+      <p class="stats" id="stats"></p>
+      <ul class="wishes" id="wishes"><li class="muted">Tiada ucapan lagi. Jadi yang pertama!</li></ul>
+    </section>
+    </div>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="card reveal">
+      <h3 class="title">Hubungi</h3>
+      <ul class="contacts" id="contacts"></ul>
+    </section>
+
+    <footer class="reveal">
+      <p class="script"><span data-f="bride"></span> &amp; <span data-f="groom"></span></p>
+      <p class="muted small">#AimanMairaEVERAFTER</p>
+      <p class="muted small">Terima kasih kerana sudi meraikan hari bahagia kami bersama-sama.</p>
+    </footer>
+  </main>
+
+  <button id="musicBtn" class="music" aria-label="Hidup/matikan muzik" hidden>♪</button>
+  <audio id="bgm" loop preload="none"></audio>
+</body>
+</html>

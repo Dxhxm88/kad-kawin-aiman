@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>RSVP List</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: Jost, system-ui, sans-serif; background: #f6f1e7; color: #3d3a34; margin: 0; padding: 24px 16px; }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { font-weight: 500; margin: 0 0 16px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat { background: #fffdf8; border: 1px solid #e6dccb; border-radius: 12px; padding: 14px; }
+    .stat b { display: block; font-size: 28px; font-weight: 500; color: #8f6f3e; }
+    .bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    input, select, button { font: inherit; padding: 8px 12px; border: 1px solid #e6dccb; border-radius: 10px; background: #fffdf8; }
+    button { background: #b08d57; color: #fff; border-color: #b08d57; cursor: pointer; }
+    .table { overflow-x: auto; background: #fffdf8; border: 1px solid #e6dccb; border-radius: 12px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #efe7d9; vertical-align: top; }
+    th { background: #f3ecdf; font-weight: 500; white-space: nowrap; }
+    .yes { color: #4f7a52; } .no { color: #a5483f; }
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>RSVP List</h1>
+    <div class="stats">
+      <div class="stat"><b id="sResp">0</b>Responses</div>
+      <div class="stat"><b id="sYes">0</b>Attending</div>
+      <div class="stat"><b id="sPax">0</b>Total guests</div>
+      <div class="stat"><b id="sNo">0</b>Not attending</div>
+    </div>
+    <div class="bar">
+      <input id="search" placeholder="Search name…" />
+      <select id="filter">
+        <option value="all">All</option>
+        <option value="yes">Attending</option>
+        <option value="no">Not attending</option>
+      </select>
+      <button id="csv">Download CSV</button>
+    </div>
+    <div class="table">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Attending</th><th>Pax</th><th>Wish</th><th>Time</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { watchRsvps } from "./db.js";
+    const $ = (s) => document.querySelector(s);
+    let all = [];
+
+    const fmt = (ms) => new Date(ms).toLocaleString();
+    function render() {
+      const q = $("#search").value.toLowerCase();
+      const f = $("#filter").value;
+      const list = all.filter((r) =>
+        r.name.toLowerCase().includes(q) &&
+        (f === "all" || (f === "yes") === r.attending));
+      const tb = $("#rows");
+      tb.innerHTML = "";
+      list.forEach((r, i) => {
+        const tr = document.createElement("tr");
+        [i + 1, r.name, r.attending ? "Yes" : "No", r.pax, r.wish || "", fmt(r.createdAt)].forEach((v, j) => {
+          const td = document.createElement("td");
+          td.textContent = v;
+          if (j === 2) td.className = r.attending ? "yes" : "no";
+          tr.append(td);
+        });
+        tb.append(tr);
+      });
+    }
+
+    watchRsvps((list) => {
+      all = list;
+      const yes = list.filter((r) => r.attending);
+      $("#sResp").textContent = list.length;
+      $("#sYes").textContent = yes.length;
+      $("#sPax").textContent = yes.reduce((a, r) => a + (Number(r.pax) || 0), 0);
+      $("#sNo").textContent = list.length - yes.length;
+      render();
+    });
+
+    $("#search").addEventListener("input", render);
+    $("#filter").addEventListener("change", render);
+    $("#csv").addEventListener("click", () => {
+      const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const lines = [["Name", "Attending", "Pax", "Wish", "Time"].join(",")]
+        .concat(all.map((r) => [r.name, r.attending ? "Yes" : "No", r.pax, r.wish, fmt(r.createdAt)].map(esc).join(",")));
+      const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv" });
+      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "rsvp.csv" });
+      a.click();
+    });
+  </script>
+</body>
+</html>

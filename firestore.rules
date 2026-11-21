@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rsvps/{id} {
+      // Anyone can read (wishes are shown on the card). No phone/email is stored.
+      allow read: if true;
+
+      // Anyone can add an RSVP, but only with the expected shape.
+      allow create: if request.resource.data.keys().hasOnly(['name', 'attending', 'pax', 'wish', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.attending is bool
+        && request.resource.data.pax is int
+        && request.resource.data.pax >= 0
+        && request.resource.data.pax <= 20
+        && request.resource.data.wish is string
+        && request.resource.data.wish.size() <= 500
+        && request.resource.data.createdAt == request.time;
+
+      // Nobody can edit or delete from the website (use the Firebase console).
+      allow update, delete: if false;
+    }
+  }
+}
