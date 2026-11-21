@@ -22,9 +22,9 @@ function resize() {
 resize();
 addEventListener("resize", resize);
 
-const PETAL_COLORS = ["#f4d6d2", "#efc3c0", "#f7e3dc", "#e9cfa9", "#fbeee6"];
-const CONFETTI_COLORS = ["#b08d57", "#d8b67a", "#efc3c0", "#e7a9a4", "#c9d3bf", "#fffdf8"];
-const HEART_COLORS = ["#e7a9a4", "#d98c87", "#efc3c0", "#d8b67a"];
+const PETAL_COLORS = ["#efdcbf", "#e3c49c", "#d2ab80", "#f6e9d4", "#c79a6e"]; // dried petals & wood shavings
+const CONFETTI_COLORS = ["#5b3e25", "#86603f", "#b98a5e", "#d9b88f", "#f3e6cf", "#a8735a"];
+const HEART_COLORS = ["#a8604c", "#b97a5e", "#8a5236", "#c99a72"];
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = (arr) => arr[(Math.random() * arr.length) | 0];
 

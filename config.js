@@ -32,8 +32,9 @@ window.WEDDING = {
   ],
 
   contacts: [
-    { name: "Abdullah (Father)", phone: "+60123456789" },
-    { name: "Salmah (Mother)",   phone: "+60198765432" },
+    { name: "Sanie/Unie", phone: "+60106605243" },
+    { name: "Ina",   phone: "+60126141841" },
+    { name: "Balqis",   phone: "+601111291305" },
   ],
 
   // Last day guests can RSVP (shown on the form). Set to "" to hide.

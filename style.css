@@ -1,14 +1,20 @@
 :root {
-  --bg: #f6f1e7;
-  --paper: #fffdf8;
-  --ink: #3d3a34;
-  --muted: #8a8378;
-  --gold: #b08d57;
-  --gold-dark: #8f6f3e;
-  --sage: #7d8c74;
-  --line: #e6dccb;
-  --ok: #4f7a52;
-  --err: #a5483f;
+  /* ---- carved-wood palette ---- */
+  --wood: #d8c09c;          /* natural wood */
+  --bg: #ecdcc0;            /* light sanded wood (insets, fields) */
+  --paper: #f7ecda;         /* plaque surface */
+  --ink: #3b2a1a;           /* engraved text */
+  --muted: #6b5640;
+  --gold: #7a5638;          /* walnut accent */
+  --gold-dark: #4f3520;     /* dark walnut */
+  --sage: #6a4f33;
+  --line: #c6a984;
+  --ok: #4e6b3e;
+  --err: #8e3b2e;
+  /* carved/engraved text: light edge below, dark edge above */
+  --carve: 0 1px 0 rgba(255, 246, 228, .65), 0 -1px 0 rgba(45, 28, 12, .22);
+  /* light wood plaque: wood texture showing through a pale wash */
+  --plaque: linear-gradient(180deg, rgba(255, 249, 238, .76), rgba(250, 238, 218, .7)), url(assets/wood.webp) center / cover;
   --radius: 18px;
   --serif: "Cormorant Garamond", Georgia, serif;
   --script: "Great Vibes", cursive;
@@ -25,40 +31,44 @@ body {
   font-size: 18px;
   line-height: 1.6;
   color: var(--ink);
-  background:
-    var(--grain),
-    radial-gradient(circle at 10% 0%, #efe4d0 0, transparent 45%),
-    radial-gradient(circle at 100% 100%, #e7ecdf 0, transparent 45%),
-    var(--bg);
-  background-attachment: fixed;
+  background: var(--wood);
   -webkit-font-smoothing: antialiased;
 }
 main, footer { position: relative; z-index: 1; }
 
-/* ---------- background decoration ---------- */
-/* botanical sprays in the top-left and bottom-right corners */
-body::before, body::after, .cover::before, .cover::after {
-  content: ""; position: fixed; width: clamp(170px, 30vw, 420px); aspect-ratio: 1;
-  background: url(assets/botanical.svg) no-repeat top left / contain;
-  pointer-events: none; z-index: 0; opacity: .6;
-  animation: sway 9s ease-in-out infinite;
+/* ---------- wood background ---------- */
+/* fixed layer (works on iPhone too, unlike background-attachment: fixed) */
+.bg-glow, .cover {
+  --woodbg:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 240, 214, .35), transparent 60%),
+    radial-gradient(ellipse at center, transparent 55%, rgba(70, 44, 20, .28) 100%),
+    url(assets/wood.webp) center / cover no-repeat,
+    var(--wood);
 }
-body::before, .cover::before { top: 0; left: 0; transform-origin: top left; --flip: rotate(0deg); }
-body::after, .cover::after { bottom: 0; right: 0; transform-origin: center; --flip: rotate(180deg); }
-.cover::before, .cover::after { position: absolute; opacity: .75; }
+.bg-glow { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--woodbg); }
+.bg-glow span { display: none; }
 
-/* slow drifting blush & sage glows */
-.bg-glow { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-.bg-glow span {
-  position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55;
-  animation: drift 22s ease-in-out infinite alternate;
+/* engraved flowers: top-right and bottom-left, like the reference artwork */
+body::before, body::after, .cover::before, .cover::after {
+  content: ""; position: fixed; pointer-events: none; z-index: 0;
+  background: no-repeat center / contain;
+  animation: sway 10s ease-in-out infinite;
+  --flip: rotate(0deg);
 }
-.bg-glow span:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: 18%; background: #f3d9d4; }
-.bg-glow span:nth-child(2) { width: 40vmax; height: 40vmax; right: -14vmax; top: 48%; background: #dfe6d6; animation-duration: 28s; animation-delay: -6s; }
-.bg-glow span:nth-child(3) { width: 30vmax; height: 30vmax; left: 30%; bottom: -12vmax; background: #f1e2c6; animation-duration: 25s; animation-delay: -12s; }
+body::before, .cover::before {
+  top: 0; right: 0; width: clamp(230px, 64vw, 620px); aspect-ratio: 909 / 652;
+  background-image: url(assets/floral-top.webp); transform-origin: top right;
+}
+body::after, .cover::after {
+  bottom: 0; left: 0; width: clamp(230px, 66vw, 600px); aspect-ratio: 988 / 569;
+  background-image: url(assets/floral-bottom.webp); transform-origin: bottom left;
+  animation-delay: -5s;
+}
+body::before, body::after { opacity: .85; }
+.cover::before, .cover::after { position: absolute; }
 body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
 
-.script { font-family: var(--script); font-weight: 400; color: var(--gold-dark); }
+.script { font-family: var(--script); font-weight: 400; color: var(--gold-dark); text-shadow: var(--carve); }
 .eyebrow {
   font-family: var(--sans); font-size: 12px; letter-spacing: .35em;
   text-transform: uppercase; color: var(--sage);
@@ -73,11 +83,20 @@ body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   padding: 12px 26px; border-radius: 999px; border: 1px solid var(--gold);
   cursor: pointer; text-decoration: none; transition: .25s ease;
 }
-.btn-gold { background: var(--gold); color: #fff; }
-.btn-gold:hover { background: var(--gold-dark); border-color: var(--gold-dark); }
+/* dark walnut button, slightly raised */
+.btn-gold {
+  background: linear-gradient(180deg, #86603f, #5b3e25); color: #f8ecd8; border-color: #45301c;
+  box-shadow: inset 0 1px 0 rgba(255, 236, 205, .25), 0 2px 5px rgba(45, 28, 12, .3);
+  text-shadow: 0 -1px 0 rgba(30, 18, 8, .4);
+}
+.btn-gold:hover { background: linear-gradient(180deg, #74512f, #4a321c); }
 .btn-gold:disabled { opacity: .6; cursor: wait; }
-.btn-outline { background: transparent; color: var(--gold-dark); }
-.btn-outline:hover { background: var(--gold); color: #fff; }
+/* outline button looks routed into the wood */
+.btn-outline {
+  background: rgba(255, 248, 235, .45); color: var(--gold-dark); border-color: rgba(79, 53, 32, .45);
+  box-shadow: inset 0 1px 2px rgba(60, 38, 18, .15);
+}
+.btn-outline:hover { background: linear-gradient(180deg, #86603f, #5b3e25); color: #f8ecd8; border-color: #45301c; }
 .btn-sm { padding: 6px 14px; font-size: 12px; }
 .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
 
@@ -86,10 +105,7 @@ body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   position: fixed; inset: 0; z-index: 50;
   display: grid; place-items: safe center; padding: 24px 16px; text-align: center;
   overflow-y: auto; overscroll-behavior: contain;
-  background:
-    linear-gradient(rgba(246,241,231,.86), rgba(246,241,231,.94)),
-    repeating-linear-gradient(45deg, #efe6d4 0 2px, transparent 2px 14px),
-    var(--bg);
+  background: var(--woodbg);
   transition: transform 1.3s cubic-bezier(.6,0,.2,1), opacity 1.3s ease, filter 1.3s ease;
 }
 .cover.opened { transform: scale(1.08); opacity: 0; filter: blur(8px); pointer-events: none; }
@@ -97,15 +113,18 @@ body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
 .cover-inner {
   position: relative; z-index: 1; isolation: isolate;
   width: min(420px, 100%); padding: 48px 28px;
-  border: 1px solid var(--line); border-radius: 220px 220px var(--radius) var(--radius);
-  background: var(--grain), linear-gradient(180deg, #fffefb, var(--paper));
-  box-shadow: 0 20px 60px rgba(120, 95, 55, .12);
+  border: 1px solid rgba(79, 53, 32, .35); border-radius: 220px 220px var(--radius) var(--radius);
+  background: var(--plaque);
+  box-shadow:
+    inset 0 2px 6px rgba(70, 44, 20, .22), inset 0 -1px 0 rgba(255, 248, 235, .6),
+    0 1px 0 rgba(255, 246, 228, .5), 0 18px 50px rgba(55, 34, 14, .28);
   animation: rise 1.2s ease both, glow 5s ease-in-out 1.2s infinite;
 }
 /* inner gold arch line + corner sprigs on the cover card */
 .cover-inner::before {
   content: ""; position: absolute; inset: 10px; z-index: -1; pointer-events: none;
-  border: 1px solid rgba(176, 141, 87, .3);
+  border: 1px solid rgba(79, 53, 32, .4);
+  box-shadow: 0 1px 0 rgba(255, 248, 235, .7), inset 0 1px 0 rgba(255, 248, 235, .7);
   border-radius: 210px 210px calc(var(--radius) - 6px) calc(var(--radius) - 6px);
 }
 .cover .btn { position: relative; }
@@ -132,30 +151,36 @@ main { width: min(560px, 100%); margin: 0 auto; padding: 40px 16px 120px; }
 }
 .ornament::after {
   content: ""; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px;
-  border: 1px solid var(--gold); background: var(--bg);
+  border: 1px solid var(--gold); background: var(--wood);
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .card {
   position: relative; isolation: isolate;
-  background: var(--grain), linear-gradient(180deg, #fffefb 0%, var(--paper) 60%, #fcf8f0 100%);
-  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--plaque);
+  border: 1px solid rgba(79, 53, 32, .35); border-radius: var(--radius);
   padding: 40px 26px; margin: 20px 0; text-align: center;
-  box-shadow: 0 1px 0 #fff inset, 0 10px 30px rgba(120, 95, 55, .07), 0 2px 6px rgba(120, 95, 55, .04);
+  /* carved-in edge + soft lift off the board */
+  box-shadow:
+    inset 0 2px 5px rgba(70, 44, 20, .2), inset 0 -1px 0 rgba(255, 248, 235, .6),
+    0 1px 0 rgba(255, 246, 228, .45), 0 10px 28px rgba(55, 34, 14, .2);
 }
-/* inner gold frame with a floral sprig in the top-left corner… */
+/* routed inner groove with an engraved sprig in the top-left corner… */
 .card::before, .card::after {
   content: ""; position: absolute; inset: 9px; z-index: -1; pointer-events: none;
   border-radius: calc(var(--radius) - 6px);
   background: url(assets/corner.svg) no-repeat -5px -5px / 66px;
 }
-.card::before { border: 1px solid rgba(176, 141, 87, .25); }
+.card::before {
+  border: 1px solid rgba(79, 53, 32, .32);
+  box-shadow: 0 1px 0 rgba(255, 248, 235, .7), inset 0 1px 0 rgba(255, 248, 235, .7);
+}
 /* …and its mirror in the bottom-right */
 .card::after { transform: rotate(180deg); }
 
 .title {
   font-family: var(--script); font-weight: 400; font-size: 40px; color: var(--gold-dark);
-  margin-bottom: 18px; line-height: 1.2;
+  margin-bottom: 18px; line-height: 1.2; text-shadow: var(--carve);
 }
 .title::after {
   content: ""; display: block; width: 130px; height: 15px; margin: 4px auto 0;
@@ -169,9 +194,13 @@ main { width: min(560px, 100%); margin: 0 auto; padding: 40px 16px 120px; }
 
 /* ---------- countdown ---------- */
 .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+/* each number sits in a carved-out pocket */
 .countdown div {
-  border: 1px solid var(--line); border-radius: 14px; padding: 12px 4px; background: var(--bg);
+  border: 1px solid rgba(79, 53, 32, .28); border-radius: 14px; padding: 12px 4px;
+  background: rgba(150, 110, 70, .1);
+  box-shadow: inset 0 2px 5px rgba(70, 44, 20, .25), 0 1px 0 rgba(255, 248, 235, .7);
 }
+.countdown b { text-shadow: var(--carve); }
 .countdown b { display: block; font-size: 30px; font-weight: 500; color: var(--gold-dark); font-variant-numeric: tabular-nums; }
 .countdown span { font-family: var(--sans); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 
@@ -198,18 +227,21 @@ form label[hidden] { display: none; }
 input:not([type=radio]), select, textarea {
   font: inherit; font-family: var(--serif); font-size: 18px; color: var(--ink);
   width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px;
-  background: var(--bg); outline: none; transition: border-color .2s;
+  background: rgba(255, 250, 240, .72); outline: none; transition: border-color .2s, background .2s;
+  box-shadow: inset 0 2px 4px rgba(70, 44, 20, .14);
 }
-input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+input:focus, select:focus, textarea:focus { border-color: var(--gold); background: rgba(255, 252, 245, .92); }
+::placeholder { color: #9b846a; }
 textarea { resize: vertical; }
 .choice { border: 0; display: grid; gap: 8px; }
 .choice legend { margin-bottom: 6px; }
 .choice label {
   display: flex; align-items: center; gap: 10px; cursor: pointer;
-  padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg);
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 250, 240, .6);
+  box-shadow: inset 0 1px 3px rgba(70, 44, 20, .1);
   font-family: var(--serif); font-size: 17px; color: var(--ink); letter-spacing: 0;
 }
-.choice label:has(input:checked) { border-color: var(--gold); background: #fbf5ea; }
+.choice label:has(input:checked) { border-color: var(--gold); background: #f3e2c4; box-shadow: inset 0 2px 4px rgba(70, 44, 20, .18); }
 .choice input { accent-color: var(--gold); width: 18px; height: 18px; }
 form .btn { justify-self: center; min-width: 180px; }
 .form-msg { text-align: center; font-family: var(--sans); font-size: 14px; color: var(--muted); min-height: 1em; }
@@ -217,20 +249,23 @@ form .btn { justify-self: center; min-width: 180px; }
 .form-msg.err { color: var(--err); }
 .demo-note {
   margin-top: 16px; font-family: var(--sans); font-size: 12px; color: var(--muted);
-  background: var(--bg); border-radius: 10px; padding: 8px 12px;
+  background: rgba(150, 110, 70, .1); border-radius: 10px; padding: 8px 12px;
 }
 
 /* ---------- wishes ---------- */
 .stats { font-family: var(--sans); font-size: 13px; color: var(--sage); margin-bottom: 14px; }
 .wishes { list-style: none; text-align: left; max-height: 420px; overflow-y: auto; display: grid; gap: 12px; padding-right: 4px; }
-.wishes li:not(.muted) { background: var(--bg); border-radius: 14px; padding: 14px 16px; }
+.wishes li:not(.muted) {
+  background: rgba(255, 250, 240, .6); border-radius: 14px; padding: 14px 16px;
+  border: 1px solid rgba(79, 53, 32, .15); box-shadow: inset 0 1px 3px rgba(70, 44, 20, .1);
+}
 .wishes li.muted { text-align: center; }
 .w-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
 .badge {
   font-family: var(--sans); font-size: 11px; padding: 2px 10px; border-radius: 999px;
-  background: #e5ecdf; color: var(--ok);
+  background: rgba(78, 107, 62, .14); color: var(--ok);
 }
-.badge.no { background: #f3e3df; color: var(--err); }
+.badge.no { background: rgba(142, 59, 46, .12); color: var(--err); }
 .w-body { margin: 6px 0; white-space: pre-line; overflow-wrap: anywhere; }
 .w-time { font-family: var(--sans); font-size: 11px; color: var(--muted); }
 
@@ -246,8 +281,8 @@ footer .script { font-size: 40px; }
 .music {
   position: fixed; right: 16px; bottom: 16px; z-index: 40;
   width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--gold);
-  background: var(--paper); color: var(--gold-dark); font-size: 20px; cursor: pointer;
-  box-shadow: 0 6px 20px rgba(120, 95, 55, .18);
+  background: var(--plaque); color: var(--gold-dark); font-size: 20px; cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(70, 44, 20, .2), 0 6px 18px rgba(55, 34, 14, .3);
 }
 .music.playing { animation: spin 4s linear infinite; }
 
@@ -287,16 +322,18 @@ body:not(.locked) .hero .big > span:last-child { animation: write 1.8s ease 2.6s
 @keyframes rise { from { opacity: 0; transform: translateY(30px); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes glow {
-  0%, 100% { box-shadow: 0 20px 60px rgba(120, 95, 55, .12), 0 0 0 0 rgba(216, 182, 122, 0); }
-  50%      { box-shadow: 0 20px 60px rgba(120, 95, 55, .16), 0 0 40px 4px rgba(231, 169, 164, .28); }
+  /* warm candle-like glow around the carved plaque */
+  0%, 100% { box-shadow: inset 0 2px 6px rgba(70, 44, 20, .22), inset 0 -1px 0 rgba(255, 248, 235, .6), 0 1px 0 rgba(255, 246, 228, .5), 0 18px 50px rgba(55, 34, 14, .28), 0 0 0 0 rgba(255, 226, 180, 0); }
+  50%      { box-shadow: inset 0 2px 6px rgba(70, 44, 20, .22), inset 0 -1px 0 rgba(255, 248, 235, .6), 0 1px 0 rgba(255, 246, 228, .5), 0 18px 50px rgba(55, 34, 14, .32), 0 0 46px 6px rgba(255, 226, 180, .45); }
 }
 @keyframes ring {
   0%   { transform: scale(1); opacity: .7; }
   100% { transform: scale(1.25, 1.6); opacity: 0; }
 }
 @keyframes softglow {
-  0%, 100% { text-shadow: 0 0 0 rgba(216, 182, 122, 0); }
-  50%      { text-shadow: 0 0 18px rgba(216, 182, 122, .55), 0 0 2px rgba(176, 141, 87, .3); }
+  /* keeps the carved edge, adds a soft warm halo */
+  0%, 100% { text-shadow: 0 1px 0 rgba(255, 246, 228, .65), 0 -1px 0 rgba(45, 28, 12, .22), 0 0 0 rgba(255, 228, 185, 0); }
+  50%      { text-shadow: 0 1px 0 rgba(255, 246, 228, .65), 0 -1px 0 rgba(45, 28, 12, .22), 0 0 16px rgba(255, 228, 185, .8); }
 }
 @keyframes beat {
   0%, 60%, 100% { transform: scale(1); }

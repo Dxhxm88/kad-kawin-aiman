@@ -51,6 +51,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".html": "text/html",
         ".json": "application/json",
         ".svg": "image/svg+xml",
+        ".webp": "image/webp",
         ".mp3": "audio/mpeg",
     }
 
