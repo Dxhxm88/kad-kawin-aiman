@@ -11,7 +11,7 @@ window.WEDDING = {
   // Parents / hosts line shown under the opening greeting
   hosts: "Rosaini Bin Halil & Zalinah Binti Karim",
 
-  greeting: "Dengan limpah kurnia dan keberkatan Allah SWT, kami dengan sukacitanya menjemput Dato'/Datin/Tuan/Puan/Encik/Cik ke majlis resepsi perkahwinan puteri kesayangan kami.",
+  greeting: "Dengan limpah kurnia dan keberkatan Allah SWT, kami dengan sukacitanya menjemput Dato'/Datin/Tuan/Puan/Encik/Cik ke majlis resepsi perkahwinan puteri kami.",
 
   // Event date & time (local time). Used for countdown + calendar.
   date: "2027-01-03T11:00:00+08:00",
@@ -21,8 +21,8 @@ window.WEDDING = {
 
   venueName: "Arjuna Melaka",
   venueAddress: "Lot 1341, Jalan Syed Ab. Aziz, 75000 Melaka, Malaysia",
-  googleMaps: "https://maps.google.com/?q=Arjuna+Melaka",
-  waze: "https://waze.com/ul?q=Arjuna%20Melaka",
+  googleMaps: "https://maps.app.goo.gl/1wR6qpAVDZvjTpux5",
+  waze: "https://ul.waze.com/ul?place=ChIJt9Dj7G7x0TERmFCf1T2QhVM&ll=2.18803760%2C102.24662630&navigate=yes&utm_campaign=live_map&utm_source=waze_app&utm_medium=lm_share_location",
 
   schedule: [
     { time: "11:00 AM", title: "Ketibaan Tetamu" },
@@ -50,7 +50,7 @@ window.WEDDING = {
   gift: {
     enabled: true,
     bankName: "Maybank",
-    accountName: "Muhammad Aiman Azim Bin Roslam",
+    accountName: "Muhammad Aiman Azim Bin Roslan",
     accountNumber: "1560 7605 9053",
     qr: "assets/qr.jpeg",
   },
