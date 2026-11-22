@@ -35,6 +35,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 main, footer { position: relative; z-index: 1; }
+/* safety net: nothing animating inside the card can ever make the page scroll sideways */
+main { overflow-x: clip; }
 
 /* ---------- wood background ---------- */
 /* fixed layer (works on iPhone too, unlike background-attachment: fixed) */
@@ -45,7 +47,13 @@ main, footer { position: relative; z-index: 1; }
     url(assets/wood.webp) center / cover no-repeat,
     var(--wood);
 }
-.bg-glow { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--woodbg); }
+/* sized to the tallest screen height (lvh) so the wood doesn't re-zoom/jump
+   when the phone's address bar hides or shows while scrolling */
+.bg-glow {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh;
+  z-index: -1; pointer-events: none; background: var(--woodbg);
+  transform: translateZ(0); backface-visibility: hidden; /* own GPU layer: no repaint flicker */
+}
 .bg-glow span { display: none; }
 
 /* engraved flowers: top-right and bottom-left, like the reference artwork */
@@ -65,7 +73,8 @@ body::after, .cover::after {
   animation-delay: -5s;
 }
 body::before, body::after { opacity: .85; }
-.cover::before, .cover::after { position: absolute; }
+/* (the cover's flowers stay position: fixed — if they were absolute, their sway would poke
+   past the cover's edge, make it scrollable on and off, and the whole cover would jump) */
 body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
 
 .script { font-family: var(--script); font-weight: 400; color: var(--gold-dark); text-shadow: var(--carve); }
@@ -105,10 +114,17 @@ body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   position: fixed; inset: 0; z-index: 50;
   display: grid; place-items: safe center; padding: 24px 16px; text-align: center;
   overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: none; /* still scrollable (sideways phones), but no scrollbar popping in and out */
   background: var(--woodbg);
   transition: transform 1.3s cubic-bezier(.6,0,.2,1), opacity 1.3s ease, filter 1.3s ease;
 }
-.cover.opened { transform: scale(1.08); opacity: 0; filter: blur(8px); pointer-events: none; }
+/* after fading out, the cover is fully removed (visibility) so no invisible blurred layer sits over the page */
+.cover::-webkit-scrollbar { display: none; }
+.cover.opened {
+  transform: scale(1.08); opacity: 0; filter: blur(8px); pointer-events: none;
+  visibility: hidden;
+  transition: transform 1.3s cubic-bezier(.6,0,.2,1), opacity 1.3s ease, filter 1.3s ease, visibility 0s linear 1.3s;
+}
 .cover.opened .cover-inner { transform: scale(.94); transition: transform 1.3s ease; }
 .cover-inner {
   position: relative; z-index: 1; isolation: isolate;
@@ -133,7 +149,9 @@ body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   border: 1px solid var(--gold); animation: ring 2.4s ease-out infinite; pointer-events: none;
 }
 .cover h1 { font-size: clamp(44px, 12vw, 64px); line-height: 1.1; margin: 18px 0 8px; }
-.cover h1 .amp, .hero .amp { display: block; font-size: .6em; color: var(--gold); }
+/* width: fit-content keeps the box only as wide as the "&", so its heartbeat
+   (scale 1.18) can't make the page wider than the screen and flash a scrollbar */
+.cover h1 .amp, .hero .amp { display: block; width: fit-content; margin-inline: auto; font-size: .6em; color: var(--gold); }
 .cover-date { font-family: var(--sans); font-size: 14px; letter-spacing: .12em; color: var(--muted); }
 .to { margin: 28px 0 4px; }
 .to .guest { font-size: 24px; font-weight: 600; }
@@ -190,7 +208,7 @@ main { width: min(560px, 100%); margin: 0 auto; padding: 40px 16px 120px; }
 .hosts { font-weight: 600; margin-bottom: 10px; }
 .greeting { font-style: italic; color: var(--muted); margin-bottom: 22px; }
 .full-name { font-size: 22px; font-weight: 600; }
-.amp-sm { font-family: var(--script); font-size: 32px; color: var(--gold); line-height: 1.2; }
+.amp-sm { font-family: var(--script); font-size: 32px; color: var(--gold); line-height: 1.2; width: fit-content; margin-inline: auto; }
 
 /* ---------- countdown ---------- */
 .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }

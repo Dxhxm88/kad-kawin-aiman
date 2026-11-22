@@ -79,6 +79,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".jpeg": "image/jpeg",
     }
 
+    def end_headers(self):
+        # always fetch fresh files while editing (otherwise Chrome keeps old CSS/JS)
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
+
     def send_json(self, data, status=200):
         raw = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
