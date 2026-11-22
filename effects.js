@@ -202,3 +202,12 @@ export function hearts(x = W / 2, y = H * 0.6, count = 14) {
   }
   kick();
 }
+
+/** A sudden shower of petals from the top (shake easter egg). */
+export function petalStorm(count = 70) {
+  if (reduced) return;
+  for (let i = 0; i < count; i++) {
+    particles.push({ ...petal(true), y: rand(-H * 0.4, -10), vy: rand(1.4, 3), size: rand(6, 12), ambient: false });
+  }
+  kick();
+}

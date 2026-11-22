@@ -1,5 +1,7 @@
 [build]
   publish = "."
+  # fills in the site address for the WhatsApp link preview (scripts/site-url.mjs)
+  command = "node scripts/site-url.mjs"
   functions = "netlify/functions"
 
 [functions]

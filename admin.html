@@ -21,12 +21,36 @@
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #efe7d9; vertical-align: top; }
     th { background: #f3ecdf; font-weight: 500; white-space: nowrap; }
     .yes { color: #4f7a52; } .no { color: #a5483f; }
+    .gate { max-width: 320px; margin: 12vh auto 0; text-align: center; background: #fffdf8; border: 1px solid #e6dccb; border-radius: 16px; padding: 28px 22px; }
+    .gate h1 { font-size: 22px; }
+    .gate form { display: grid; gap: 10px; }
+    .gate input { text-align: center; font-size: 20px; letter-spacing: .2em; }
+    .gate .err { color: #a5483f; min-height: 1.2em; margin: 4px 0 0; font-size: 14px; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .top h1 { margin: 0; }
+    .ghost { background: none; color: #8f6f3e; border-color: #e6dccb; }
+    [hidden] { display: none !important; }
   </style>
   <script src="config.js"></script>
 </head>
 <body>
-  <div class="wrap">
+  <div class="gate" id="gate">
     <h1>RSVP List</h1>
+    <form id="pinForm">
+      <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" required />
+      <button type="submit" id="pinBtn">Open</button>
+    </form>
+    <p class="err" id="pinErr" role="alert"></p>
+  </div>
+
+  <div class="wrap" id="app" hidden>
+    <div class="top">
+      <h1>RSVP List</h1>
+      <span>
+        <button class="ghost" id="refresh">Refresh</button>
+        <button class="ghost" id="lock">Lock</button>
+      </span>
+    </div>
     <div class="stats">
       <div class="stat"><b id="sResp">0</b>Responses</div>
       <div class="stat"><b id="sYes">0</b>Attending</div>
@@ -51,9 +75,11 @@
   </div>
 
   <script type="module">
-    import { watchRsvps } from "./db.js";
+    import { fetchAll } from "./db.js";
     const $ = (s) => document.querySelector(s);
     let all = [];
+    let pin = "";
+    let timer;
 
     const fmt = (ms) => new Date(ms).toLocaleString();
     function render() {
@@ -76,7 +102,7 @@
       });
     }
 
-    watchRsvps((list) => {
+    function show(list) {
       all = list;
       const yes = list.filter((r) => r.attending);
       $("#sResp").textContent = list.length;
@@ -84,7 +110,47 @@
       $("#sPax").textContent = yes.reduce((a, r) => a + (Number(r.pax) || 0), 0);
       $("#sNo").textContent = list.length - yes.length;
       render();
-    });
+    }
+
+    /* ---------- PIN gate (the PIN is checked by the server, not in this page) ---------- */
+    async function unlock(p) {
+      $("#pinBtn").disabled = true;
+      $("#pinErr").textContent = "";
+      try {
+        show(await fetchAll(p));
+        pin = p;
+        try { sessionStorage.setItem("admin_pin", p); } catch {}
+        $("#gate").hidden = true;
+        $("#app").hidden = false;
+        clearInterval(timer);
+        timer = setInterval(() => { if (!document.hidden) reload(); }, 30000);
+      } catch (err) {
+        try { sessionStorage.removeItem("admin_pin"); } catch {}
+        $("#pinErr").textContent = err.status === 401 ? "Wrong PIN." : err.message;
+        $("#pin").select();
+      } finally {
+        $("#pinBtn").disabled = false;
+      }
+    }
+    async function reload() {
+      try { show(await fetchAll(pin)); } catch (err) { if (err.status === 401) lock(); }
+    }
+    function lock() {
+      pin = ""; all = []; render();
+      clearInterval(timer);
+      try { sessionStorage.removeItem("admin_pin"); } catch {}
+      $("#app").hidden = true;
+      $("#gate").hidden = false;
+      $("#pin").value = "";
+      $("#pin").focus();
+    }
+
+    $("#pinForm").addEventListener("submit", (e) => { e.preventDefault(); unlock($("#pin").value.trim()); });
+    $("#refresh").addEventListener("click", reload);
+    $("#lock").addEventListener("click", lock);
+    let saved = null;
+    try { saved = sessionStorage.getItem("admin_pin"); } catch {}
+    if (saved) unlock(saved); else $("#pin").focus();
 
     $("#search").addEventListener("input", render);
     $("#filter").addEventListener("change", render);

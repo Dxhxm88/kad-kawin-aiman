@@ -1,7 +1,11 @@
 /* RSVP API on Netlify — each RSVP is saved as one JSON record in Netlify Blobs.
-   GET  /api/rsvp  → JSON array of all RSVPs (newest first)
-   POST /api/rsvp  → save one RSVP { name, attending, pax, wish }        */
+   GET  /api/rsvp                     → public view for the card: { stats, wishes }
+   GET  /api/rsvp + x-admin-pin header → full RSVP list (for admin.html)
+   POST /api/rsvp                     → save one RSVP { name, attending, pax, wish }
+
+   The admin PIN is set in Netlify: Site configuration → Environment variables → ADMIN_PIN */
 import { getStore } from "@netlify/blobs";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -20,13 +24,44 @@ function clean(body) {
   return { name, attending, pax, wish, createdAt: Date.now() };
 }
 
+/* what everyone can see: totals + the wishes (no per-guest pax, no names of people without a wish) */
+function publicView(list) {
+  const yes = list.filter((r) => r.attending);
+  return {
+    stats: {
+      yes: yes.length,
+      pax: yes.reduce((a, r) => a + (Number(r.pax) || 0), 0),
+      no: list.length - yes.length,
+    },
+    wishes: list
+      .filter((r) => r.wish)
+      .map(({ id, name, attending, wish, createdAt }) => ({ id, name, attending, wish, createdAt })),
+  };
+}
+
+const sha = (s) => createHash("sha256").update(String(s)).digest();
+const pinOk = (given, real) => !!given && timingSafeEqual(sha(given), sha(real));
+
 export default async (req) => {
   const rsvps = store();
 
   if (req.method === "GET") {
     const { blobs } = await rsvps.list();
-    const list = await Promise.all(blobs.map((b) => rsvps.get(b.key, { type: "json" })));
-    return json(list.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt));
+    const list = (await Promise.all(blobs.map((b) => rsvps.get(b.key, { type: "json" }))))
+      .filter(Boolean)
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+    const given = req.headers.get("x-admin-pin");
+    if (given != null) {
+      const real = process.env.ADMIN_PIN;
+      if (!real) return json({ error: "ADMIN_PIN is not set on Netlify" }, 503);
+      if (!pinOk(given, real)) {
+        await new Promise((r) => setTimeout(r, 800)); // slow down guessing
+        return json({ error: "Wrong PIN" }, 401);
+      }
+      return json(list);
+    }
+    return json(publicView(list));
   }
 
   if (req.method === "POST") {

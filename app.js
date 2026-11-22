@@ -1,5 +1,5 @@
 import { saveRsvp, watchRsvps, demoMode } from "./db.js";
-import { startPetals, celebrate, hearts } from "./effects.js";
+import { startPetals, celebrate, hearts, petalStorm } from "./effects.js";
 
 startPetals();
 
@@ -13,11 +13,22 @@ document.querySelectorAll("[data-f]").forEach((el) => {
 document.title = `${W.groom} & ${W.bride} — Jemputan Perkahwinan`;
 
 /* ---------- guest name from ?to=Name ---------- */
-const guest = new URLSearchParams(location.search).get("to");
+const params = new URLSearchParams(location.search);
+const guest = params.get("to");
 if (guest) {
   $("#guestName").textContent = guest.slice(0, 60);
   $("#guestBox").hidden = false;
 }
+
+/* ---------- before / on / after the wedding day (Malaysia time) ----------
+   Preview with ?hari=ini (wedding day) or ?hari=selepas (after the wedding). */
+const myDay = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur" }).format(d); // YYYY-MM-DD
+const today = myDay(new Date());
+const weddingDay = myDay(new Date(W.date));
+const phase =
+  params.get("hari") === "ini" ? "day" :
+  params.get("hari") === "selepas" ? "after" :
+  today < weddingDay ? "before" : today === weddingDay ? "day" : "after";
 
 /* ---------- open invitation ---------- */
 const audio = $("#bgm");
@@ -39,6 +50,8 @@ $("#openBtn").addEventListener("click", () => {
   if (W.music) audio.play().then(() => setPlaying(true)).catch(() => {});
   celebrate();
   setTimeout(() => hearts(innerWidth / 2, innerHeight * 0.55, 16), 450);
+  // on the big day, one more burst of joy
+  if (phase === "day") setTimeout(() => celebrate({ x: innerWidth / 2, y: innerHeight * 0.7, count: 80 }), 1600);
 });
 
 /* tap the couple's names for a little shower of hearts */
@@ -59,30 +72,92 @@ const SECRETS = [
 ];
 let secretIdx = 0;
 let secretTimer;
+/* show the little carved note at the bottom of the screen */
+function showSecret(eyebrow, message, foot = "") {
+  $("#secretEyebrow").textContent = eyebrow;
+  $("#secretMsg").textContent = message;
+  $("#secretFoot").textContent = foot;
+  $("#secretFoot").hidden = !foot;
+  secret.hidden = false;
+  secret.classList.remove("show");
+  void secret.offsetWidth; // restart the pop-in animation
+  secret.classList.add("show");
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => (secret.hidden = true), 5000);
+}
+secret.addEventListener("click", () => (secret.hidden = true));
+
 tagBtn.addEventListener("click", async (e) => {
   const tag = tagBtn.textContent.trim();
   let copied = false;
   try { await navigator.clipboard.writeText(tag); copied = true; } catch {}
-
-  $("#secretMsg").textContent = SECRETS[secretIdx % SECRETS.length];
-  $("#secretFoot").textContent = copied
-    ? `${tag} disalin. Kongsikan gambar anda dengan hashtag ini!`
-    : `Kongsikan gambar anda dengan ${tag}`;
-  // restart the pop-in animation on every tap
-  secret.hidden = false;
-  secret.classList.remove("show");
-  void secret.offsetWidth;
-  secret.classList.add("show");
-  clearTimeout(secretTimer);
-  secretTimer = setTimeout(() => (secret.hidden = true), 5000);
-
+  showSecret(
+    "Rahsia kecil 🤍",
+    SECRETS[secretIdx % SECRETS.length],
+    copied ? `${tag} disalin. Kongsikan gambar anda dengan hashtag ini!` : `Kongsikan gambar anda dengan ${tag}`
+  );
   const x = e.clientX || innerWidth / 2;
   const y = e.clientY || innerHeight * 0.8;
   if (secretIdx === 0) celebrate({ x, y, count: 90 });
   hearts(x, y, 22);
   secretIdx++;
 });
-secret.addEventListener("click", () => (secret.hidden = true));
+
+/* easter egg: press and hold the "&" between the names → the date in the Hijri calendar */
+const hijri = (() => {
+  try {
+    return new Intl.DateTimeFormat("ms-MY-u-ca-islamic-umalqura", {
+      day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kuala_Lumpur",
+    }).format(new Date(W.date));
+  } catch { return ""; }
+})();
+const amp = $(".hero .amp");
+if (amp && hijri) {
+  let holdTimer;
+  const cancelHold = () => clearTimeout(holdTimer);
+  amp.addEventListener("pointerdown", (e) => {
+    const { clientX: x, clientY: y } = e;
+    holdTimer = setTimeout(() => {
+      showSecret("Tarikh keramat kami", hijri, `bersamaan ${W.dateLabel}`);
+      hearts(x, y, 16);
+    }, 650);
+  });
+  ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => amp.addEventListener(ev, cancelHold));
+  amp.addEventListener("contextmenu", (e) => e.preventDefault());
+}
+
+/* easter egg: tap the "Saat" (seconds) box 5 times quickly */
+let secTaps = 0, secTapTimer;
+$("#cdSec").addEventListener("click", (e) => {
+  secTaps++;
+  clearTimeout(secTapTimer);
+  secTapTimer = setTimeout(() => (secTaps = 0), 1500);
+  if (secTaps >= 5) {
+    secTaps = 0;
+    showSecret("Setiap saat 🤍", "Setiap saat bersamamu itu berharga.");
+    hearts(e.clientX, e.clientY, 18);
+  }
+});
+
+/* easter egg: shake the phone → a shower of petals.
+   Android only: iPhones would first pop up a motion-permission prompt, which spoils the surprise. */
+if ("DeviceMotionEvent" in window && typeof DeviceMotionEvent.requestPermission !== "function") {
+  let lastShake = 0, prev = null;
+  addEventListener("devicemotion", (e) => {
+    const a = e.accelerationIncludingGravity;
+    if (!a || a.x == null || document.body.classList.contains("locked")) return;
+    if (prev) {
+      const jolt = Math.abs(a.x - prev.x) + Math.abs(a.y - prev.y) + Math.abs(a.z - prev.z);
+      const now = Date.now();
+      if (jolt > 32 && now - lastShake > 4000) {
+        lastShake = now;
+        petalStorm(80);
+        showSecret("Goncang-goncang 🌸", "Hujan kelopak bunga untuk anda!");
+      }
+    }
+    prev = { x: a.x, y: a.y, z: a.z };
+  });
+}
 
 /* ---------- scroll reveal ---------- */
 const io = new IntersectionObserver(
@@ -116,8 +191,21 @@ function setNum(sel, v) {
   void el.offsetWidth; // restart animation
   el.classList.add("tick");
 }
-tick();
-setInterval(tick, 1000);
+if (phase === "before") {
+  tick();
+  setInterval(tick, 1000);
+} else {
+  $("#countdown").hidden = true;
+  $("#calBtn").hidden = true;
+  $("#dayMsg").hidden = false;
+  if (phase === "day") {
+    $("#cdTitle").textContent = "Hari Ini!";
+    $("#dayMsg").textContent = `Hari ini hari bahagia kami! 🤍 Jumpa anda di ${W.venueName}.`;
+  } else {
+    $("#cdTitle").textContent = "Terima Kasih";
+    $("#dayMsg").textContent = "Terima kasih kerana meraikan kami. Kehadiran dan doa anda amat kami hargai.";
+  }
+}
 
 /* ---------- links ---------- */
 const gcalDate = (iso) => new Date(iso).toISOString().replace(/[-:]|\.\d{3}/g, "");
@@ -259,15 +347,12 @@ const timeAgo = (ms) => {
 };
 
 watchRsvps(
-  (list) => {
-    const yes = list.filter((r) => r.attending);
-    const pax = yes.reduce((a, r) => a + (Number(r.pax) || 0), 0);
-    $("#stats").textContent = list.length
-      ? `${yes.length} hadir (${pax} tetamu) · ${list.length - yes.length} tidak dapat hadir`
+  ({ stats, wishes: withWish }) => {
+    $("#stats").textContent = stats.yes + stats.no
+      ? `${stats.yes} hadir (${stats.pax} tetamu) · ${stats.no} tidak dapat hadir`
       : "";
 
     const ul = $("#wishes");
-    const withWish = list.filter((r) => r.wish);
     ul.innerHTML = "";
     if (!withWish.length) {
       ul.innerHTML = `<li class="muted">Tiada ucapan lagi. Jadi yang pertama!</li>`;
