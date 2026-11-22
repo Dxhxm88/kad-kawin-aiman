@@ -44,4 +44,14 @@ window.WEDDING = {
   // Optional background music (mp3 path or URL). "" to disable.
   music: "audio.mp3",
 
+  // Money gift (Salam Kaut). Shown as a small fold-out near the end of the card.
+  // Put your bank / DuitNow QR image in the assets folder and set its path below.
+  // Set enabled: false to hide the whole section.
+  gift: {
+    enabled: true,
+    bankName: "Maybank",
+    accountName: "Muhammad Aiman Azim Bin Roslam",
+    accountNumber: "1560 7605 9053",
+    qr: "assets/qr.jpeg",
+  },
 };

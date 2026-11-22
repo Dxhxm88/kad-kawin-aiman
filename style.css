@@ -269,6 +269,47 @@ form .btn { justify-self: center; min-width: 180px; }
 .w-body { margin: 6px 0; white-space: pre-line; overflow-wrap: anywhere; }
 .w-time { font-family: var(--sans); font-size: 11px; color: var(--muted); }
 
+/* ---------- gift (Salam Kaut): quiet, folded away ---------- */
+.gift { max-width: 460px; margin: 28px auto; text-align: center; }
+.gift[hidden] { display: none; }
+.gift details {
+  background: var(--plaque); border: 1px solid rgba(79, 53, 32, .25); border-radius: 14px;
+  box-shadow: inset 0 1px 4px rgba(70, 44, 20, .15), 0 1px 0 rgba(255, 246, 228, .45), 0 6px 18px rgba(55, 34, 14, .12);
+}
+.gift summary {
+  list-style: none; cursor: pointer; padding: 16px 20px; display: grid; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.gift summary::-webkit-details-marker { display: none; }
+.gift-note { font-style: italic; font-size: 15px; color: var(--muted); }
+.gift-toggle {
+  justify-self: center; display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans); font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); padding-bottom: 2px; border-bottom: 1px dotted rgba(79, 53, 32, .4);
+}
+.gift summary:hover .gift-toggle { color: var(--gold-dark); }
+.chev {
+  width: 7px; height: 7px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg); transition: transform .3s ease;
+}
+.gift details[open] .chev { transform: translateY(1px) rotate(225deg); }
+.gift-body { padding: 4px 20px 22px; display: grid; justify-items: center; gap: 4px; }
+.gift details[open] .gift-body { animation: fadeup .5s ease both; }
+.gift-intro { font-size: 15px; color: var(--muted); margin-bottom: 10px; }
+/* QR sits on white so banking apps can scan it */
+.qr-frame {
+  background: #fff; padding: 10px; border-radius: 12px; margin-bottom: 10px;
+  border: 1px solid rgba(79, 53, 32, .3);
+  box-shadow: inset 0 1px 3px rgba(70, 44, 20, .15), 0 2px 8px rgba(55, 34, 14, .12);
+}
+.qr-frame[hidden] { display: none; }
+.qr-frame img { display: block; width: min(200px, 56vw); height: auto; border-radius: 4px; }
+.gift-bank { font-family: var(--sans); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--sage); }
+.gift-name { font-weight: 600; }
+.gift-acc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; font-size: 20px; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.gift-save { margin-top: 8px; font-family: var(--sans); font-size: 12px; color: var(--gold); text-decoration: underline dotted; text-underline-offset: 3px; }
+.gift-save[hidden] { display: none; }
+
 /* ---------- contacts ---------- */
 .contacts { list-style: none; display: grid; gap: 12px; }
 .contacts li { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; text-align: left; }

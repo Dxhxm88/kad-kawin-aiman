@@ -57,4 +57,5 @@ https://your-site.netlify.app/?to=Ahmad%20%26%20Family
 - If the API can't be reached (for example the page is opened from a plain file server), the card falls back to **demo mode** and RSVPs are saved only in that browser. A note under the form says so.
 - `admin.html` is not password-protected (it shows the same names and wishes the card shows publicly). Don't share its link widely. No phone numbers or emails are collected.
 - A hidden "website" field in the form catches simple spam bots.
+- Money gift (Salam Kaut): save your bank / DuitNow QR as `assets/qr.png` (or change `gift.qr` in `config.js`) and fill in the bank details there. It shows as a small fold-out above the contacts. If the QR image is missing, only the account details are shown. Set `gift.enabled: false` to hide it.
 - Background music: put an mp3 in the folder and set `music: "song.mp3"` in `config.js`. It starts when the guest taps **Buka Jemputan**.

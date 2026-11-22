@@ -114,6 +114,41 @@ W.contacts.forEach(({ name, phone }) => {
   $("#contacts").append(li);
 });
 
+/* ---------- gift (Salam Kaut) ---------- */
+const G = W.gift;
+if (G && G.enabled) {
+  $("#gift").hidden = false;
+  document.querySelectorAll("[data-g]").forEach((el) => { el.textContent = G[el.dataset.g] ?? ""; });
+
+  const img = $("#giftQr");
+  if (G.qr) {
+    img.src = G.qr;
+    $("#saveQr").href = G.qr;
+  }
+  // no QR image yet (or wrong path) → just show the account details
+  const noQr = () => {
+    $("#qrFrame").hidden = true;
+    $("#saveQr").hidden = true;
+    $(".gift-intro").textContent = "Sekiranya ingin menghulurkan tanda kasih, boleh buat pindahan terus:";
+  };
+  if (!G.qr) noQr();
+  img.addEventListener("error", noQr);
+
+  const copyBtn = $("#copyAcc");
+  copyBtn.addEventListener("click", async () => {
+    const acc = String(G.accountNumber).replace(/\s+/g, "");
+    try {
+      await navigator.clipboard.writeText(acc);
+    } catch {
+      // older browsers: copy via a temporary text box
+      const t = Object.assign(document.createElement("textarea"), { value: acc });
+      document.body.append(t); t.select(); document.execCommand("copy"); t.remove();
+    }
+    copyBtn.textContent = "Disalin ✓";
+    setTimeout(() => (copyBtn.textContent = "Salin"), 2000);
+  });
+}
+
 /* ---------- RSVP form ---------- */
 const form = $("#rsvpForm");
 const msg = $("#formMsg");

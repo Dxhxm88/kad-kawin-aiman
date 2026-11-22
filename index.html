@@ -121,6 +121,29 @@
     </section>
     </div>
 
+    <!-- ============ GIFT (Salam Kaut) — quiet fold-out ============ -->
+    <section class="gift reveal" id="gift" hidden>
+      <details>
+        <summary>
+          <span class="gift-note">Kehadiran dan doa restu anda sudah cukup bermakna buat kami.</span>
+          <span class="gift-toggle">Salam Kaut <span class="chev" aria-hidden="true"></span></span>
+        </summary>
+        <div class="gift-body">
+          <p class="gift-intro">Sekiranya ingin menghulurkan tanda kasih, boleh imbas kod QR atau pindahan terus:</p>
+          <figure class="qr-frame" id="qrFrame">
+            <img id="giftQr" alt="Kod QR untuk pindahan bank" />
+          </figure>
+          <p class="gift-bank" data-g="bankName"></p>
+          <p class="gift-name" data-g="accountName"></p>
+          <p class="gift-acc">
+            <span data-g="accountNumber"></span>
+            <button type="button" class="btn btn-sm btn-outline" id="copyAcc">Salin</button>
+          </p>
+          <a class="gift-save" id="saveQr" download="kod-qr-salam-kaut">Simpan kod QR ke telefon</a>
+        </div>
+      </details>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <section class="card reveal">
       <h3 class="title">Hubungi</h3>
