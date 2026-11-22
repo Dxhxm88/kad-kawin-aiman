@@ -322,6 +322,7 @@ footer .script { font-size: 40px; }
 .doa-ar { font-size: 28px; line-height: 1.9; color: var(--gold-dark); text-shadow: var(--carve); margin: 4px 0 14px; }
 .doa-ms { font-style: italic; color: var(--ink); max-width: 30em; margin: 0 auto; }
 .doa-src { font-family: var(--sans); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 12px; }
+.doa-sep { color: var(--gold); opacity: .7; margin: 22px 0 18px; font-size: 14px; letter-spacing: .6em; }
 @media (min-width: 768px) { .doa-ar { font-size: 34px; } }
 
 /* wedding day / after the wedding: a message instead of the countdown */
