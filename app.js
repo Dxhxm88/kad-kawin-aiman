@@ -348,9 +348,6 @@ const timeAgo = (ms) => {
 
 watchRsvps(
   ({ stats, wishes: withWish }) => {
-    $("#stats").textContent = stats.yes + stats.no
-      ? `${stats.yes} hadir (${stats.pax} tetamu) · ${stats.no} tidak dapat hadir`
-      : "";
 
     const ul = $("#wishes");
     ul.innerHTML = "";
@@ -360,11 +357,8 @@ watchRsvps(
     }
     withWish.forEach((r) => {
       const li = document.createElement("li");
-      li.innerHTML = `<p class="w-head"><b></b><span class="badge"></span></p><p class="w-body"></p><p class="w-time"></p>`;
+      li.innerHTML = `<p class="w-head"><b></b></p><p class="w-body"></p><p class="w-time"></p>`;
       li.querySelector("b").textContent = r.name;
-      const badge = li.querySelector(".badge");
-      badge.textContent = r.attending ? "Hadir" : "Tidak hadir";
-      badge.classList.toggle("no", !r.attending);
       li.querySelector(".w-body").textContent = r.wish;
       li.querySelector(".w-time").textContent = timeAgo(r.createdAt);
       ul.append(li);
