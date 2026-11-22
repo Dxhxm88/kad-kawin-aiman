@@ -318,6 +318,32 @@ form .btn { justify-self: center; min-width: 180px; }
 footer { text-align: center; padding: 40px 0 0; }
 footer .script { font-size: 40px; }
 
+/* hashtag looks like plain text, but it's tappable (easter egg) */
+.tag {
+  font: inherit; color: inherit; background: none; border: 0; padding: 4px 6px; cursor: pointer;
+  letter-spacing: .04em; border-radius: 6px; transition: color .3s ease, text-shadow .3s ease;
+}
+.tag:hover, .tag:focus-visible { color: var(--gold-dark); text-shadow: 0 0 12px rgba(255, 228, 185, .9); }
+.tag:active { transform: scale(.96); }
+
+/* secret note that pops up */
+.secret {
+  position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 70;
+  width: min(360px, calc(100% - 32px)); transform: translateX(-50%);
+  padding: 18px 22px 16px; text-align: center; cursor: pointer;
+  background: var(--plaque); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: inset 0 2px 6px rgba(70, 44, 20, .22), inset 0 -1px 0 rgba(255, 248, 235, .6), 0 18px 50px rgba(55, 34, 14, .35);
+}
+.secret[hidden] { display: none; }
+.secret.show { animation: secretpop .6s cubic-bezier(.2, 1.4, .4, 1) both; }
+.secret-eyebrow { font-family: var(--sans); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.secret-msg { font-family: "Great Vibes", cursive; font-size: 30px; line-height: 1.25; color: var(--gold-dark); margin: 6px 0 8px; text-shadow: var(--carve); }
+.secret-foot { font-family: var(--sans); font-size: 12px; color: var(--muted); }
+@keyframes secretpop {
+  from { opacity: 0; transform: translateX(-50%) translateY(24px) scale(.9); }
+  to   { opacity: 1; transform: translateX(-50%); }
+}
+
 /* ---------- music ---------- */
 .music {
   position: fixed; right: 16px; bottom: 16px; z-index: 40;

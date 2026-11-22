@@ -47,6 +47,43 @@ document.querySelectorAll(".hero .big, footer .script").forEach((el) => {
   el.addEventListener("click", (e) => hearts(e.clientX, e.clientY, 10));
 });
 
+/* ---------- easter egg: tap the hashtag ---------- */
+const tagBtn = $("#hashtag");
+const secret = $("#secret");
+const SECRETS = [
+  `Tahniah, anda jumpa rahsia kecil ${W.groom} & ${W.bride}!`,
+  "Dari kenalan, jadi teman, kini teman hidup.",
+  "Cinta itu sederhana: kamu, aku, dan doa.",
+  "Semoga bahagia hingga ke Jannah, InsyaAllah.",
+  `${W.groom} 🤍 ${W.bride}, selamanya.`,
+];
+let secretIdx = 0;
+let secretTimer;
+tagBtn.addEventListener("click", async (e) => {
+  const tag = tagBtn.textContent.trim();
+  let copied = false;
+  try { await navigator.clipboard.writeText(tag); copied = true; } catch {}
+
+  $("#secretMsg").textContent = SECRETS[secretIdx % SECRETS.length];
+  $("#secretFoot").textContent = copied
+    ? `${tag} disalin. Kongsikan gambar anda dengan hashtag ini!`
+    : `Kongsikan gambar anda dengan ${tag}`;
+  // restart the pop-in animation on every tap
+  secret.hidden = false;
+  secret.classList.remove("show");
+  void secret.offsetWidth;
+  secret.classList.add("show");
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => (secret.hidden = true), 5000);
+
+  const x = e.clientX || innerWidth / 2;
+  const y = e.clientY || innerHeight * 0.8;
+  if (secretIdx === 0) celebrate({ x, y, count: 90 });
+  hearts(x, y, 22);
+  secretIdx++;
+});
+secret.addEventListener("click", () => (secret.hidden = true));
+
 /* ---------- scroll reveal ---------- */
 const io = new IntersectionObserver(
   (entries) => entries.forEach((e) => {

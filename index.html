@@ -152,10 +152,17 @@
 
     <footer class="reveal">
       <p class="script"><span data-f="bride"></span> &amp; <span data-f="groom"></span></p>
-      <p class="muted small">#AimanMairaEVERAFTER</p>
+      <p class="muted small"><button type="button" class="tag" id="hashtag">#AimanMairaEVERAFTER</button></p>
       <p class="muted small">Terima kasih kerana sudi meraikan hari bahagia kami bersama-sama.</p>
     </footer>
   </main>
+
+  <!-- easter egg: tap the hashtag in the footer -->
+  <div class="secret" id="secret" role="status" aria-live="polite" hidden>
+    <p class="secret-eyebrow">Rahsia kecil 🤍</p>
+    <p class="secret-msg" id="secretMsg"></p>
+    <p class="secret-foot" id="secretFoot"></p>
+  </div>
 
   <button id="musicBtn" class="music" aria-label="Hidup/matikan muzik" hidden>♪</button>
   <audio id="bgm" loop preload="none"></audio>
