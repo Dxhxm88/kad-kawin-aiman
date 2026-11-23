@@ -337,15 +337,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-/* ---------- wishes list ---------- */
-const timeAgo = (ms) => {
-  const s = Math.floor((Date.now() - ms) / 1000);
-  if (s < 60) return "baru sahaja";
-  if (s < 3600) return `${Math.floor(s / 60)} minit lalu`;
-  if (s < 86400) return `${Math.floor(s / 3600)} jam lalu`;
-  return new Date(ms).toLocaleDateString("ms-MY", { day: "numeric", month: "short", year: "numeric" });
-};
-
+/* ---------- wishes list (name + wish, no date) ---------- */
 watchRsvps(
   ({ stats, wishes: withWish }) => {
 
@@ -357,10 +349,9 @@ watchRsvps(
     }
     withWish.forEach((r) => {
       const li = document.createElement("li");
-      li.innerHTML = `<p class="w-head"><b></b></p><p class="w-body"></p><p class="w-time"></p>`;
+      li.innerHTML = `<p class="w-head"><b></b></p><p class="w-body"></p>`;
       li.querySelector("b").textContent = r.name;
       li.querySelector(".w-body").textContent = r.wish;
-      li.querySelector(".w-time").textContent = timeAgo(r.createdAt);
       ul.append(li);
     });
   },
