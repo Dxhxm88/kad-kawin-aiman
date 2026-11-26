@@ -335,6 +335,13 @@ form .btn { justify-self: center; min-width: 180px; }
 
 footer { text-align: center; padding: 40px 0 0; }
 footer .script { font-size: 40px; }
+/* small maker's credit at the very bottom */
+.credit {
+  margin-top: 34px; padding-top: 14px; border-top: 1px solid rgba(79, 53, 32, .15);
+  font-family: var(--sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); opacity: .8;
+}
+.credit a { color: var(--gold-dark); text-decoration: none; font-weight: 500; }
+.credit a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* doa for the couple */
 .doa-ar { font-size: 28px; line-height: 1.9; color: var(--gold-dark); text-shadow: var(--carve); margin: 4px 0 14px; }
